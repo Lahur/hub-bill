@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face {
+    font-family: 'BankGothic Md BT';
+    src: url('{{{templateDir}}}/BankGothic Md BT.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 11pt;
+    color: #000;
+    padding: 20mm 20mm 28mm 20mm;
+  }
+
+  /* Header */
+  .page-header {
+    width: 100%;
+    margin-bottom: 16pt;
+    overflow: hidden;
+  }
+  .page-header .logo {
+    float: left;
+    height: 70px;
+  }
+  .page-header .company-info {
+    text-align: right;
+  }
+  .page-header .company-name {
+    font-family: Arial, sans-serif;
+    font-size: 11pt;
+    color: #333333;
+  }
+  .page-header .company-address {
+    color: #333333;
+    font-size: 10pt;
+  }
+
+  /* Recipient / company info table */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14pt;
+  }
+  .info-table td {
+    vertical-align: middle;
+    font-size: 10pt;
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    padding: 2px 4px;
+  }
+  .recipient-cell {
+    background-color: #C0C0C0;
+    padding: 6px 8px !important;
+    vertical-align: top !important;
+    width: 47%;
+  }
+  .recipient-cell .recipient-name {
+    font-size: 13pt;
+    font-weight: normal;
+    color: #000;
+    margin-bottom: 2px;
+  }
+  .recipient-cell .recipient-address {
+    font-size: 12pt;
+  }
+  .recipient-cell .recipient-oib {
+    font-weight: bold;
+  }
+  .spacer-cell { width: 8%; }
+  .contact-label { width: 18%; }
+  .contact-value { width: 27%; }
+
+  /* Section heading */
+  .section-heading {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    font-size: 14pt;
+    font-weight: normal;
+    background-color: #d3d3d3;
+    margin-bottom: 6pt;
+    padding: 2px 0;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 1.5px solid #808080;
+    margin: 6pt 0;
+  }
+
+  /* Bill header line */
+  .bill-title {
+    font-family: 'BankGothic Md BT', 'Arial Black', Georgia, serif;
+    font-size: 16pt;
+    font-weight: normal;
+    display: flex;
+    justify-content: space-between;
+    margin: 4pt 0;
+  }
+
+  /* Body text */
+  .body-text {
+    font-size: 11pt;
+    margin: 4pt 0;
+  }
+
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 4pt 0;
+  }
+  .price-table td {
+    padding: 2px 4px;
+    vertical-align: bottom;
+    white-space: nowrap;
+  }
+  .price-table .col-label { width: 40%; }
+  .price-table .col-dots {
+    width: 100%;
+    border-bottom: 1px dotted #000;
+  }
+  .price-table .col-price {
+    text-align: right;
+    padding-left: 12px;
+  }
+  .price-table tr.total-row td {
+    border: 1px solid #000;
+    padding: 4px 6px;
+  }
+  .price-table tr.total-row .col-dots {
+    border-top: none;
+    border-bottom: 1px dotted #000;
+    border-left: none;
+    border-right: none;
+  }
+
+  .closing {
+    margin-top: 10pt;
+    padding-left: 40px;
+  }
+  .closing p { margin: 2pt 0; }
+  .closing .signature {
+    margin-top: 30px;
+    text-align: right;
+    padding-right: 10mm;
+  }
+
+  .page-footer {
+    position: fixed;
+    bottom: 0;
+    left: 20mm;
+    right: 20mm;
+    font-size: 9pt;
+    border-top: 1px solid #ccc;
+    padding-top: 4pt;
+    padding-bottom: 4pt;
+    color: #333;
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<!-- Page header with logo -->
+<div class="page-header">
+  <img class="logo" src="{{{templateDir}}}/logo.jpeg" alt="Logo">
+  <div class="company-info">
+    <div class="company-name">DRUŠTVO ZA PROJEKTIRANJE I USLUGE</div>
+    <div class="company-address">Zagreb, Ul. Ljudevita Posavskog 34a;</div>
+    <div class="company-address">Sjedište Karlovac, Kranjčevićeva 16</div>
+  </div>
+</div>
+
+<!-- Recipient / company info table -->
+<table class="info-table">
+  <tr>
+    <td class="recipient-cell" rowspan="5">
+      <div class="recipient-name">{{recipientName}}</div>
+      <div class="recipient-address">{{recipientAddress}}</div>
+      <div class="recipient-oib">{{recipientPost}} {{recipientCity}}</div>
+      <div class="recipient-oib">OIB {{recipientOib}}</div>
+    </td>
+    <td class="spacer-cell"></td>
+    <td class="contact-label"></td>
+    <td class="contact-value"></td>
+  </tr>
+  <tr>
+    <td class="spacer-cell"></td>
+    <td class="contact-label">Telefon/fax :</td>
+    <td class="contact-value">047655404</td>
+  </tr>
+  <tr>
+    <td class="spacer-cell"></td>
+    <td class="contact-label">Mobitel :</td>
+    <td class="contact-value">0912026316</td>
+  </tr>
+  <tr>
+    <td class="spacer-cell"></td>
+    <td class="contact-label" style="font-size:9pt;">Žiro račun :</td>
+    <td class="contact-value" style="font-size:9pt;">HR042360000-1102542068</td>
+  </tr>
+  <tr>
+    <td class="spacer-cell"></td>
+    <td class="contact-label" style="font-size:9pt;">OIB :</td>
+    <td class="contact-value">31728187872</td>
+  </tr>
+</table>
+
+<!-- Section heading -->
+<div class="section-heading">PROJEKTIRANJE  I INŽINJERSKE  USLUGE I TEHNIČKO SAVJETOVANJE</div>
+
+<hr class="divider">
+
+<!-- Bill title -->
+<div class="bill-title">
+  <span>RAČUN br.&nbsp; {{billNumber}}</span>
+  <span>{{billDate}}</span>
+</div>
+
+<hr class="divider">
+
+<p class="body-text">&nbsp;</p>
+
+<p class="body-text">DATUM IZVRŠENJA &nbsp;&nbsp; {{billDate}}</p>
+
+<p class="body-text">&nbsp;</p>
+
+<p class="body-text">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  Temeljem Narudžbe zaračunavamo Vam {{billProjectDescription}} u iznosu:
+</p>
+
+<p class="body-text">&nbsp;</p>
+
+<!-- Price table -->
+<table class="price-table">
+  <tr>
+    <td class="col-label">{{billProjectName}}</td>
+    <td class="col-dots"></td>
+    <td class="col-price">{{billBasePrice}} EUR</td>
+  </tr>
+  {{#if billPdvPrice}}
+  <tr>
+    <td class="col-label">P D V &nbsp;&nbsp; 25 %</td>
+    <td class="col-dots"></td>
+    <td class="col-price">{{billPdvPrice}} EUR</td>
+  </tr>
+  {{/if}}
+  <tr class="total-row">
+    <td class="col-label">UKUPNO :</td>
+    <td class="col-dots"></td>
+    <td class="col-price">{{billTotalPrice}} EUR</td>
+  </tr>
+</table>
+
+<p class="body-text">&nbsp;</p>
+
+<p class="body-text">Napomena: Obračun prema naplaćenim naknadama ( prema čl.125. i st.5 Zakona ).</p>
+
+{{#if billReverseCharge}}
+<p class="body-text">Prijenos porezne obveze prema članku 75. stavak 3. Zakona o porezu na dodanu vrijednost NN 75/13.</p>
+{{/if}}
+
+<p class="body-text">
+  Datum plaćanja u roku {{paymentDays}} dana.
+  Slovima: {{billTotalText}}.
+</p>
+
+<p class="body-text">Vrijeme: {{billTime}} &nbsp;&nbsp; Način plaćanja: Transakcijski račun</p>
+
+{{#if pdf417Image}}<img src="data:image/png;base64,{{{pdf417Image}}}" style="width: 205px; height: auto;"/>{{/if}}
+{{#if zki}}<p class="body-text">ZKI: {{zki}}</p>{{/if}}
+{{#if jir}}<p class="body-text">JIR: {{jir}}</p>{{/if}}
+
+<!-- Closing -->
+<div class="closing">
+  <p>&nbsp;</p>
+  <p>Sa štovanjem!</p>
+  <p>&nbsp;</p>
+  <p>{{billDate}}</p>
+  <div class="signature">
+    <p>Direktor:</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>Sandra Belavić</p>
+  </div>
+</div>
+
+<!-- Page footer -->
+<div class="page-footer">
+  TEHNOMODUS d.o.o., društvo za projektiranje i usluge, u Zagreb, Ulica kneza LJ. Posavskog 34 A,<br>
+  Upisano u Trgovački sud u Zagrebu pod MBS 081031226
+</div>
+
+</body>
+</html>

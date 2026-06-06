@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face {
+    font-family: 'BankGothic Md BT';
+    src: url('{{{templateDir}}}/BankGothic Md BT.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @page {
+    size: A4;
+    margin: 15mm 20mm;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    color: #000;
+    width: 170mm;
+    max-width: 170mm;
+  }
+
+  @media screen {
+    body {
+      padding: 15mm 20mm;
+      width: auto;
+      max-width: 210mm;
+    }
+  }
+
+  @media print {
+    body {
+      padding: 0;
+    }
+  }
+
+  /* Header */
+  .page-header {
+    width: 100%;
+    margin-bottom: 12pt;
+    border-bottom: 1.5px solid #808080;
+    padding-bottom: 8pt;
+    overflow: hidden;
+  }
+  .page-header .logo { float: left; height: 50px; }
+  .page-header .company-info { text-align: right; }
+  .page-header .company-name { font-size: 10pt; color: #333; }
+  .page-header .company-address { font-size: 9pt; color: #555; }
+
+  /* Bill reference */
+  .bill-ref {
+    font-family: 'BankGothic Md BT', 'Arial Black', Georgia, serif;
+    font-size: 13pt;
+    margin-bottom: 10pt;
+    color: #333;
+  }
+  .bill-ref span { font-size: 10pt; color: #666; margin-left: 12px; }
+
+  /* Section */
+  .section { margin-bottom: 10pt; }
+  .section-title {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    font-size: 10pt;
+    font-weight: bold;
+    background-color: #d3d3d3;
+    padding: 2px 6px;
+    margin-bottom: 4pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Two-column layout for sections */
+  .fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px 20px;
+  }
+  .fields.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .field { display: flex; gap: 6px; padding: 1px 0; }
+  .field-label {
+    font-size: 8.5pt;
+    color: #555;
+    white-space: nowrap;
+    min-width: 110px;
+  }
+  .field-value { font-size: 9pt; color: #000; }
+
+  /* Lines table */
+  .lines-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+  }
+  .lines-table th {
+    background-color: #d3d3d3;
+    padding: 3px 6px;
+    text-align: left;
+    font-weight: bold;
+    border: 1px solid #bbb;
+  }
+  .lines-table td {
+    padding: 3px 6px;
+    border: 1px solid #ddd;
+    vertical-align: top;
+  }
+  .lines-table tr:nth-child(even) td { background-color: #f7f7f7; }
+  .lines-table .num { text-align: right; }
+
+  /* Subtotals table */
+  .subtotals-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+  }
+  .subtotals-table th {
+    background-color: #d3d3d3;
+    padding: 3px 6px;
+    text-align: left;
+    font-weight: bold;
+    border: 1px solid #bbb;
+  }
+  .subtotals-table td {
+    padding: 3px 6px;
+    border: 1px solid #ddd;
+  }
+  .subtotals-table .num { text-align: right; }
+
+  /* Summary box */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 4pt;
+  }
+  .summary-item {
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    background: #fafafa;
+  }
+  .summary-item .label { font-size: 7.5pt; color: #666; }
+  .summary-item .value { font-size: 10pt; font-weight: bold; color: #000; }
+
+  .badge {
+    display: inline-block;
+    background: #e0e0e0;
+    border-radius: 2px;
+    padding: 1px 5px;
+    font-size: 8pt;
+    color: #333;
+  }
+  .badge.copy { background: #fff3cd; color: #856404; }
+
+  /* Print layout controls */
+  .section { page-break-inside: avoid; }
+  .lines-table, .subtotals-table { page-break-inside: avoid; }
+  .page-header { page-break-after: avoid; }
+
+  /* Prevent long values from overflowing */
+  .field-value {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+</style>
+</head>
+<body>
+
+<!-- Page header -->
+<div class="page-header">
+  <img class="logo" src="{{{templateDir}}}/logo.jpeg" alt="Logo">
+  <div class="company-info">
+    <div class="company-name">DRUŠTVO ZA PROJEKTIRANJE I USLUGE</div>
+    <div class="company-address">Zagreb, Ul. Ljudevita Posavskog 34a;</div>
+    <div class="company-address">Sjedište Karlovac, Kranjčevićeva 16</div>
+  </div>
+</div>
+
+<!-- Bill reference line -->
+<div class="bill-ref">
+  RAČUN br. {{billNumber}}
+  <span>{{billDate}}</span>
+  {{#if copyIndicator}}<span class="badge copy">KOPIJA</span>{{/if}}
+</div>
+
+<!-- Invoice metadata -->
+<div class="section">
+  <div class="section-title">Podaci o računu</div>
+  <div class="fields cols-3">
+    <div class="field">
+      <span class="field-label">Vrsta dokumenta:</span>
+      <span class="field-value">{{invoiceTypeCode}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Valuta:</span>
+      <span class="field-value">{{currencyCode}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Datum dospijeća:</span>
+      <span class="field-value">{{dueDate}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Period od:</span>
+      <span class="field-value">{{periodStart}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Period do:</span>
+      <span class="field-value">{{periodEnd}}</span>
+    </div>
+    {{#if orderReferenceId}}
+    <div class="field">
+      <span class="field-label">Referenca narudžbe:</span>
+      <span class="field-value">{{orderReferenceId}}</span>
+    </div>
+    {{/if}}
+    {{#if customizationId}}
+    <div class="field">
+      <span class="field-label">Customization ID:</span>
+      <span class="field-value">{{customizationId}}</span>
+    </div>
+    {{/if}}
+    {{#if profileId}}
+    <div class="field">
+      <span class="field-label">Profile ID:</span>
+      <span class="field-value">{{profileId}}</span>
+    </div>
+    {{/if}}
+  </div>
+  {{#if invoiceNote}}
+  <div class="field" style="margin-top:4px;">
+    <span class="field-label">Napomena:</span>
+    <span class="field-value">{{invoiceNote}}</span>
+  </div>
+  {{/if}}
+</div>
+
+<!-- Supplier -->
+<div class="section">
+  <div class="section-title">Dobavljač (Izdavatelj)</div>
+  <div class="fields">
+    <div class="field">
+      <span class="field-label">Naziv:</span>
+      <span class="field-value">{{supplier.name}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">OIB:</span>
+      <span class="field-value">{{supplier.oib}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Adresa:</span>
+      <span class="field-value">{{supplier.street}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Grad:</span>
+      <span class="field-value">{{supplier.postalZone}} {{supplier.city}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Država:</span>
+      <span class="field-value">{{supplier.countryCode}}</span>
+    </div>
+    {{#if supplier.contactName}}
+    <div class="field">
+      <span class="field-label">Kontakt osoba:</span>
+      <span class="field-value">{{supplier.contactName}}</span>
+    </div>
+    {{/if}}
+    {{#if supplier.contactOib}}
+    <div class="field">
+      <span class="field-label">OIB kontakta:</span>
+      <span class="field-value">{{supplier.contactOib}}</span>
+    </div>
+    {{/if}}
+    {{#if supplier.phone}}
+    <div class="field">
+      <span class="field-label">Telefon:</span>
+      <span class="field-value">{{supplier.phone}}</span>
+    </div>
+    {{/if}}
+    {{#if supplier.email}}
+    <div class="field">
+      <span class="field-label">Email:</span>
+      <span class="field-value">{{supplier.email}}</span>
+    </div>
+    {{/if}}
+  </div>
+</div>
+
+<!-- Customer -->
+<div class="section">
+  <div class="section-title">Kupac (Primatelj)</div>
+  <div class="fields">
+    <div class="field">
+      <span class="field-label">Naziv:</span>
+      <span class="field-value">{{customer.name}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">OIB:</span>
+      <span class="field-value">{{customer.oib}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Adresa:</span>
+      <span class="field-value">{{customer.street}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Grad:</span>
+      <span class="field-value">{{customer.postalZone}} {{customer.city}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Država:</span>
+      <span class="field-value">{{customer.countryCode}}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Payment means -->
+<div class="section">
+  <div class="section-title">Način plaćanja</div>
+  <div class="fields">
+    <div class="field">
+      <span class="field-label">Šifra načina plaćanja:</span>
+      <span class="field-value">{{paymentMeans.code}}</span>
+    </div>
+    <div class="field">
+      <span class="field-label">Datum dospijeća:</span>
+      <span class="field-value">{{paymentMeans.dueDate}}</span>
+    </div>
+    {{#if paymentMeans.channelCode}}
+    <div class="field">
+      <span class="field-label">Kanal plaćanja:</span>
+      <span class="field-value">{{paymentMeans.channelCode}}</span>
+    </div>
+    {{/if}}
+    {{#if paymentMeans.iban}}
+    <div class="field">
+      <span class="field-label">IBAN:</span>
+      <span class="field-value">{{paymentMeans.iban}}</span>
+    </div>
+    {{/if}}
+    {{#if paymentMeans.accountCurrencyCode}}
+    <div class="field">
+      <span class="field-label">Valuta računa:</span>
+      <span class="field-value">{{paymentMeans.accountCurrencyCode}}</span>
+    </div>
+    {{/if}}
+    {{#if paymentMeans.paymentId}}
+    <div class="field">
+      <span class="field-label">ID plaćanja:</span>
+      <span class="field-value">{{paymentMeans.paymentId}}</span>
+    </div>
+    {{/if}}
+    {{#if paymentMeans.instructionNote}}
+    <div class="field">
+      <span class="field-label">Napomena:</span>
+      <span class="field-value">{{paymentMeans.instructionNote}}</span>
+    </div>
+    {{/if}}
+  </div>
+</div>
+
+<!-- Invoice lines -->
+<div class="section">
+  <div class="section-title">Stavke računa</div>
+  <table class="lines-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Naziv</th>
+        <th>Opis</th>
+        <th>Klasifikacija</th>
+        <th>Kol.</th>
+        <th>Jed.</th>
+        <th>Jed. cijena</th>
+        <th>PDV kat.</th>
+        <th class="num">Iznos</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each lines}}
+      <tr>
+        <td>{{this.id}}</td>
+        <td>{{this.name}}</td>
+        <td>{{this.description}}</td>
+        <td>{{#if this.classificationCode}}<span class="badge">{{this.classificationCode}}</span>{{/if}}</td>
+        <td>{{this.quantity}}</td>
+        <td>{{this.unitCode}}</td>
+        <td class="num">{{this.unitPrice}}</td>
+        <td><span class="badge">{{this.vatCategory}}</span></td>
+        <td class="num">{{this.lineExtensionAmount}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+<!-- Tax breakdown -->
+<div class="section">
+  <div class="section-title">Porezni pregled</div>
+  <table class="subtotals-table">
+    <thead>
+      <tr>
+        <th>Kategorija</th>
+        <th class="num">Stopa (%)</th>
+        <th class="num">Osnovica</th>
+        <th class="num">Porez</th>
+        <th>Razlog oslobođenja</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each taxSubtotals}}
+      <tr>
+        <td><span class="badge">{{this.categoryId}}</span></td>
+        <td class="num">{{this.percent}}</td>
+        <td class="num">{{this.taxableAmount}}</td>
+        <td class="num">{{this.taxAmount}}</td>
+        <td>{{#if this.taxExemptionReason}}{{this.taxExemptionReason}}{{/if}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+<!-- Financial summary -->
+<div class="section" style="padding-top: 20mm;">
+  <div class="section-title">Financijski pregled</div>
+  <div class="summary">
+    <div class="summary-item">
+      <div class="label">Iznos bez poreza</div>
+      <div class="value">{{monetary.lineExtensionAmount}} {{currencyCode}}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Porezna osnovica</div>
+      <div class="value">{{monetary.taxExclusiveAmount}} {{currencyCode}}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Ukupni porez</div>
+      <div class="value">{{taxTotalAmount}} {{currencyCode}}</div>
+    </div>
+    {{#if monetary.prepaidAmount}}
+    <div class="summary-item">
+      <div class="label">Predujam</div>
+      <div class="value">{{monetary.prepaidAmount}} {{currencyCode}}</div>
+    </div>
+    {{/if}}
+    <div class="summary-item">
+      <div class="label">Iznos s porezom</div>
+      <div class="value">{{monetary.taxInclusiveAmount}} {{currencyCode}}</div>
+    </div>
+    <div class="summary-item" style="border-color:#000;">
+      <div class="label">Za platiti</div>
+      <div class="value" style="font-size:12pt;">{{monetary.payableAmount}} {{currencyCode}}</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
