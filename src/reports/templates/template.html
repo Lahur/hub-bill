@@ -21,7 +21,7 @@
   /* Header */
   .page-header {
     width: 100%;
-    margin-bottom: 16pt;
+    margin-bottom: 10pt;
     overflow: hidden;
   }
   .page-header .logo {
@@ -45,13 +45,13 @@
   .info-wrapper {
     display: flex;
     width: 100%;
-    margin-bottom: 14pt;
+    margin-bottom: 10pt;
     align-items: flex-start;
   }
   .info-table {
     width: 53%;
     border-collapse: collapse;
-    margin-top: 62.5px;
+    margin-top: 50px;
   }
   .info-table td {
     vertical-align: middle;
@@ -63,7 +63,7 @@
     background-color: #C0C0C0;
     padding: 8px;
     width: 47%;
-    min-height: 200px;
+    min-height: 160px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -139,10 +139,11 @@
   }
 
   .closing {
-    margin-top: 10pt;
+    margin-top: 6pt;
     padding-left: 40px;
   }
   .closing p { margin: 2pt 0; }
+  .spacer { height: 5pt; }
   .closing .signature {
     margin-top: 30px;
     text-align: left;
@@ -229,18 +230,18 @@
 
 <hr class="divider">
 
-<p class="body-text">&nbsp;</p>
+<div class="spacer"></div>
 
 <p class="body-text">DATUM IZVRŠENJA &nbsp;&nbsp; {{billDate}}</p>
 
-<p class="body-text">&nbsp;</p>
+<div class="spacer"></div>
 
 <p class="body-text">
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   Temeljem Narudžbe zaračunavamo Vam {{billProjectDescription}} u iznosu:
 </p>
 
-<p class="body-text">&nbsp;</p>
+<div class="spacer"></div>
 
 <!-- Price table -->
 <table class="price-table">
@@ -264,7 +265,7 @@
   </tr>
 </table>
 
-<p class="body-text">&nbsp;</p>
+<div class="spacer"></div>
 
 <p class="body-text">Napomena: Obračun prema naplaćenim naknadama ( prema čl.125. i st.5 Zakona ).</p>
 
@@ -285,9 +286,9 @@
 
 <!-- Closing -->
 <div class="closing">
-  <p>&nbsp;</p>
+  <div class="spacer"></div>
   <p>Sa štovanjem!</p>
-  <p>&nbsp;</p>
+  <div class="spacer"></div>
   <p>{{billDate}}</p>
   <div class="signature">
     <p>Direktor:</p>
