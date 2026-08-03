@@ -1,0 +1,6 @@
+apiVersion: v2
+name: hub-bill
+description: hub-bill NestJS app for generating bill/invoice PDF reports, for the k3s "local" namespace.
+type: application
+version: 0.1.0
+appVersion: "0.0.1"

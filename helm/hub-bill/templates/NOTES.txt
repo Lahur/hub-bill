@@ -1,0 +1,26 @@
+hub-bill deployed to namespace {{ .Release.Namespace }}.
+
+Internal-only service, reachable within the namespace at:
+
+  http://{{ .Release.Name }}-app:{{ .Values.service.port }}
+
+Before deploying, make sure the hub-bill-base image has been built and pushed
+to the cluster registry (see docker/base/Dockerfile) - kaniko cannot run
+apt-get in-cluster (permission-denied bug), so docker/prod.Dockerfile builds
+from that pre-built base instead:
+
+  docker build -t docker-registry.registry.svc.cluster.local:5000/hub-bill-base:latest docker/base
+  docker push docker-registry.registry.svc.cluster.local:5000/hub-bill-base:latest
+
+Also confirm the k3s node(s) can pull from the plain-HTTP registry - if this
+hasn't been done yet, add to /etc/rancher/k3s/registries.yaml on each node and
+restart k3s:
+
+  mirrors:
+    "docker-registry.registry.svc.cluster.local:5000":
+      endpoint:
+        - "http://docker-registry.registry.svc.cluster.local:5000"
+  configs:
+    "docker-registry.registry.svc.cluster.local:5000":
+      tls:
+        insecure_skip_verify: true

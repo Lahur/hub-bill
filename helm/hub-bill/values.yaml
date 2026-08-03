@@ -1,0 +1,20 @@
+image:
+  repository: docker-registry.registry.svc.cluster.local:5000/hub-bill
+  tag: latest
+  pullPolicy: Always
+
+app:
+  replicaCount: 1
+  containerPort: 3000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+service:
+  # ClusterIP: internal-only, consumed by other apps inside the namespace.
+  type: ClusterIP
+  port: 3000
