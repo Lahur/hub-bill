@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -14,6 +14,8 @@ const TEMPLATES_DIR = path.join(__dirname, 'templates');
 
 @Injectable()
 export class ReportsService {
+  private readonly logger = new Logger(ReportsService.name);
+
   private async renderTemplate(
     templateFile: string,
     data: object,
@@ -30,12 +32,19 @@ export class ReportsService {
     const tmpFile = path.join(os.tmpdir(), `report-${Date.now()}.html`);
     fs.writeFileSync(tmpFile, html);
 
+    const start = Date.now();
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     try {
       const page = await browser.newPage();
       await page.goto(`file://${tmpFile}`, { waitUntil: 'load' });
       const pdf = await page.pdf({ format: 'A4', printBackground: true });
+      this.logger.log(
+        `Rendered ${templateFile} in ${Date.now() - start}ms`,
+      );
       return Buffer.from(pdf);
+    } catch (err) {
+      this.logger.error(`Failed to render ${templateFile}`, err.stack);
+      throw err;
     } finally {
       await browser.close();
       fs.unlinkSync(tmpFile);
@@ -43,10 +52,12 @@ export class ReportsService {
   }
 
   async createBill(dto: BillReportDto): Promise<Buffer> {
+    this.logger.log(`Creating bill ${dto.billNumber}`);
     return this.renderTemplate('template.html', dto);
   }
 
   async createDetailedBill(dto: BillWithDetailsReportDto): Promise<Buffer> {
+    this.logger.log(`Creating detailed bill ${dto.billNumber}`);
     const [billBuffer, detailsBuffer] = await Promise.all([
       this.renderTemplate('template.html', dto),
       this.renderTemplate('template_details.html', dto.details),
@@ -59,10 +70,12 @@ export class ReportsService {
       pages.forEach((page) => merged.addPage(page));
     }
 
+    this.logger.log(`Merged detailed bill ${dto.billNumber}`);
     return Buffer.from(await merged.save());
   }
 
   async createIngoingBill(dto: IncomingInvoiceReportDto): Promise<Buffer> {
+    this.logger.log(`Creating incoming invoice ${dto.invoiceId}`);
     return this.renderTemplate('template_outgoing.html', dto);
   }
 }
