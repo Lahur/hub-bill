@@ -33,7 +33,9 @@ export class ReportsService {
     fs.writeFileSync(tmpFile, html);
 
     const start = Date.now();
-    const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-crash-reporter'],
+    });
     try {
       const page = await browser.newPage();
       await page.goto(`file://${tmpFile}`, { waitUntil: 'load' });

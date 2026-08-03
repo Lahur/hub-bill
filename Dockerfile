@@ -20,7 +20,7 @@ RUN apt-get update \
        ca-certificates fonts-liberation libasound2 libatk-bridge2.0-0 libatk1.0-0 \
        libcups2 libdbus-1-3 libdrm2 libgbm1 libgtk-3-0 libnspr4 libnss3 \
        libx11-xcb1 libxcomposite1 libxdamage1 libxfixes3 libxkbcommon0 \
-       libxrandr2 xdg-utils libu2f-udev libvulkan1 wget unzip \
+       libxrandr2 xdg-utils libu2f-udev libvulkan1 wget unzip tini \
     && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -r hub-bill && useradd -r -g hub-bill -m hub-bill
@@ -41,4 +41,5 @@ ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000
 
+ENTRYPOINT ["tini", "--"]
 CMD ["node", "dist/main"]
