@@ -4,14 +4,14 @@ image:
   pullPolicy: Always
 
 app:
-  replicaCount: 2
+  replicaCount: 1
   containerPort: 3000
   resources:
     requests:
-      cpu: "1"
+      cpu: 200m
       memory: 256Mi
     limits:
-      cpu: "1.5"
+      cpu: 750m
       memory: 1Gi
 
 service:
@@ -20,7 +20,4 @@ service:
   port: 3000
 
 metrics:
-  enabled: true
   portName: http
-  path: /metrics
-  interval: 30s
