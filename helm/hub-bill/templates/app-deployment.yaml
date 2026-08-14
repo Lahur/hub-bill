@@ -26,17 +26,20 @@ spec:
           resources:
             {{- toYaml .Values.app.resources | nindent 12 }}
           startupProbe:
-            tcpSocket:
+            httpGet:
+              path: /
               port: {{ .Values.app.containerPort }}
             periodSeconds: 10
             failureThreshold: 24
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /
               port: {{ .Values.app.containerPort }}
-            periodSeconds: 10
+            periodSeconds: 5
             failureThreshold: 3
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /
               port: {{ .Values.app.containerPort }}
             periodSeconds: 20
             failureThreshold: 3

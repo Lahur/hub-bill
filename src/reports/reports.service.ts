@@ -1,9 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import { randomUUID } from 'crypto';
 import * as Handlebars from 'handlebars';
-import puppeteer from 'puppeteer';
+import puppeteer, { Browser } from 'puppeteer';
 import { PDFDocument } from 'pdf-lib';
 import { BillReportDto } from './dto/bill-report.dto';
 import { BillWithDetailsReportDto } from './dto/bill-with-details-report.dto';
@@ -13,8 +19,19 @@ import { IncomingInvoiceReportDto } from './dto/incoming-invoice-report.dto';
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
 
 @Injectable()
-export class ReportsService {
+export class ReportsService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ReportsService.name);
+  private browser: Browser;
+
+  async onModuleInit() {
+    this.browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-crash-reporter'],
+    });
+  }
+
+  async onModuleDestroy() {
+    await this.browser.close();
+  }
 
   private async renderTemplate(
     templateFile: string,
@@ -29,15 +46,12 @@ export class ReportsService {
       templateDir: `file://${TEMPLATES_DIR}`,
     });
 
-    const tmpFile = path.join(os.tmpdir(), `report-${Date.now()}.html`);
+    const tmpFile = path.join(os.tmpdir(), `report-${randomUUID()}.html`);
     fs.writeFileSync(tmpFile, html);
 
     const start = Date.now();
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-crash-reporter'],
-    });
+    const page = await this.browser.newPage();
     try {
-      const page = await browser.newPage();
       await page.goto(`file://${tmpFile}`, { waitUntil: 'load' });
       const pdf = await page.pdf({ format: 'A4', printBackground: true });
       this.logger.log(
@@ -48,7 +62,7 @@ export class ReportsService {
       this.logger.error(`Failed to render ${templateFile}`, err.stack);
       throw err;
     } finally {
-      await browser.close();
+      await page.close();
       fs.unlinkSync(tmpFile);
     }
   }
