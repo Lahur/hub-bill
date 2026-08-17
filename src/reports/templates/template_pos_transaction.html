@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    color: #000;
+    padding: 12mm 15mm 20mm 15mm;
+  }
+
+  .page-header {
+    width: 100%;
+    margin-bottom: 8pt;
+    overflow: hidden;
+  }
+  .page-header .company-info {
+    text-align: right;
+  }
+  .page-header .company-name {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #333;
+  }
+  .page-header .company-sub {
+    font-size: 9pt;
+    color: #555;
+  }
+
+  .section-heading {
+    font-size: 11pt;
+    font-weight: normal;
+    background-color: #d3d3d3;
+    margin-bottom: 4pt;
+    padding: 2px 5px;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 1.5px solid #808080;
+    margin: 4pt 0;
+  }
+
+  .bill-title {
+    font-size: 14pt;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    margin: 2pt 0;
+  }
+
+  .meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8pt;
+    font-size: 9pt;
+  }
+  .meta-table td {
+    padding: 2px 5px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .meta-table td:first-child {
+    color: #555;
+    width: 35%;
+  }
+
+  .payment-box {
+    background-color: #f0f0f0;
+    padding: 5px 8px;
+    font-size: 9pt;
+    margin-bottom: 8pt;
+  }
+  .payment-box .payment-label {
+    font-size: 8pt;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .payment-box .iban {
+    font-size: 11pt;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .payment-box .payment-line { margin: 1px 0; }
+
+  .amount-box {
+    background-color: #f0f0f0;
+    padding: 5px 8px;
+    margin-bottom: 8pt;
+    text-align: right;
+  }
+  .amount-box .amount-label {
+    font-size: 8pt;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+  .amount-box .amount-value {
+    font-size: 16pt;
+    font-weight: bold;
+  }
+
+  .notes-box {
+    font-size: 9pt;
+    margin-bottom: 8pt;
+  }
+  .notes-box p { margin: 1px 0; }
+
+  .badge {
+    display: inline-block;
+    border-radius: 2px;
+    padding: 1px 6px;
+    font-size: 8pt;
+  }
+  .badge.yes { background: #d4edda; color: #155724; }
+  .badge.no { background: #f8d7da; color: #721c24; }
+
+  .page-footer {
+    position: fixed;
+    bottom: 0;
+    left: 15mm;
+    right: 15mm;
+    font-size: 8pt;
+    border-top: 1px solid #ccc;
+    padding-top: 3pt;
+    padding-bottom: 4pt;
+    color: #555;
+    text-align: center;
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<!-- Bill title -->
+<div class="bill-title">
+  <span>POS TRANSAKCIJA br. {{transactionId}}</span>
+  <span>{{transactionDate}}</span>
+</div>
+
+<hr class="divider">
+
+<!-- Transaction metadata -->
+<div class="section-heading">Podaci o transakciji</div>
+<table class="meta-table">
+  <tr><td>ID transakcije</td><td>{{transactionId}}</td></tr>
+  {{#if bankTransactionId}}
+  <tr><td>ID bankovne transakcije</td><td>{{bankTransactionId}}</td></tr>
+  {{/if}}
+  <tr><td>Datum transakcije</td><td>{{transactionDate}}</td></tr>
+  <tr><td>Vrijeme transakcije</td><td>{{transactionTime}}</td></tr>
+  <tr><td>Valuta</td><td>{{currencyCode}}</td></tr>
+  {{#if reference}}
+  <tr><td>Poziv na broj</td><td>{{reference}}</td></tr>
+  {{/if}}
+  <tr>
+    <td>Račun učitan</td>
+    <td>
+      {{#if hasBill}}
+      <span class="badge yes">Da</span>
+      {{else}}
+      <span class="badge no">Ne</span>
+      {{/if}}
+    </td>
+  </tr>
+</table>
+
+<!-- Amount -->
+<div class="amount-box">
+  <div class="amount-label">Iznos transakcije</div>
+  <div class="amount-value">{{amount}} {{currencyCode}}</div>
+</div>
+
+<!-- Payment info -->
+<div class="section-heading">Podaci o plaćanju</div>
+<div class="payment-box">
+  <div class="payment-label">IBAN pošiljatelja</div>
+  <div class="iban">{{senderIban}}</div>
+  <div class="payment-label" style="margin-top:4px;">IBAN primatelja</div>
+  <div class="iban">{{receiverIban}}</div>
+</div>
+
+<!-- Notes -->
+{{#if additionalRemittanceInfo}}
+<div class="section-heading">Napomene</div>
+<div class="notes-box">
+  <p>{{additionalRemittanceInfo}}</p>
+</div>
+{{/if}}
+
+<!-- Footer -->
+<div class="page-footer">
+  POS transakcija {{transactionId}} &nbsp;|&nbsp; {{transactionDate}} {{transactionTime}}
+</div>
+
+</body>
+</html>

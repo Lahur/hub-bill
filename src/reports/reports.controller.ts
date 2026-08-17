@@ -4,6 +4,7 @@ import { ReportsService } from './reports.service';
 import { BillReportDto } from './dto/bill-report.dto';
 import { BillWithDetailsReportDto } from './dto/bill-with-details-report.dto';
 import { IncomingInvoiceReportDto } from './dto/incoming-invoice-report.dto';
+import { PosTransactionReportDto } from './dto/pos-transaction-report.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -41,6 +42,19 @@ export class ReportsController {
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="incoming-invoice.pdf"',
+    });
+    res.send(pdf);
+  }
+
+  @Post('pos-transaction')
+  async generatePosTransaction(
+    @Body() dto: PosTransactionReportDto,
+    @Res() res: express.Response,
+  ) {
+    const pdf = await this.reportsService.createPosTransaction(dto);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'inline; filename="pos-transaction.pdf"',
     });
     res.send(pdf);
   }

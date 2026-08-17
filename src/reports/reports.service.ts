@@ -15,6 +15,7 @@ import { BillReportDto } from './dto/bill-report.dto';
 import { BillWithDetailsReportDto } from './dto/bill-with-details-report.dto';
 import { InvoiceDetailsReportDto } from './dto/invoice-details-report.dto';
 import { IncomingInvoiceReportDto } from './dto/incoming-invoice-report.dto';
+import { PosTransactionReportDto } from './dto/pos-transaction-report.dto';
 
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
 
@@ -93,5 +94,10 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
   async createIngoingBill(dto: IncomingInvoiceReportDto): Promise<Buffer> {
     this.logger.log(`Creating incoming invoice ${dto.invoiceId}`);
     return this.renderTemplate('template_outgoing.html', dto);
+  }
+
+  async createPosTransaction(dto: PosTransactionReportDto): Promise<Buffer> {
+    this.logger.log(`Creating POS transaction report ${dto.transactionId}`);
+    return this.renderTemplate('template_pos_transaction.html', dto);
   }
 }
