@@ -5,6 +5,8 @@ import { BillReportDto } from './dto/bill-report.dto';
 import { BillWithDetailsReportDto } from './dto/bill-with-details-report.dto';
 import { IncomingInvoiceReportDto } from './dto/incoming-invoice-report.dto';
 import { PosTransactionReportDto } from './dto/pos-transaction-report.dto';
+import { DisbursementReportDto } from './dto/disbursement-report.dto';
+import { DepositReportDto } from './dto/deposit-report.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -55,6 +57,32 @@ export class ReportsController {
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="pos-transaction.pdf"',
+    });
+    res.send(pdf);
+  }
+
+  @Post('disbursement')
+  async generateDisbursement(
+    @Body() dto: DisbursementReportDto,
+    @Res() res: express.Response,
+  ) {
+    const pdf = await this.reportsService.createDisbursement(dto);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'inline; filename="disbursement.pdf"',
+    });
+    res.send(pdf);
+  }
+
+  @Post('deposit')
+  async generateDeposit(
+    @Body() dto: DepositReportDto,
+    @Res() res: express.Response,
+  ) {
+    const pdf = await this.reportsService.createDeposit(dto);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'inline; filename="deposit.pdf"',
     });
     res.send(pdf);
   }
