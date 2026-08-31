@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @page { size: A4; }
+
+  body {
+    font-family: Arial, "Helvetica Neue", sans-serif;
+    font-size: 7.5pt;
+    color: #000;
+    line-height: 1.3;
+    padding: 12mm 10mm 14mm 10mm;
+  }
+
+  /* ---------- Header ---------- */
+  .head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16pt;
+    padding-bottom: 6pt;
+    border-bottom: 1.5px solid #808080;
+  }
+  .head .bank .name { font-size: 9pt; font-weight: bold; }
+  .head .bank div { color: #333; }
+  .head .doc { text-align: right; }
+  .head .doc .title {
+    font-size: 13pt;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    margin-bottom: 4pt;
+  }
+  .head .doc .owner-name { font-weight: bold; margin-top: 4pt; }
+
+  .account-bar {
+    margin: 8pt 0 4pt;
+    padding: 3pt 6pt;
+    background: #ededed;
+    font-size: 8.5pt;
+  }
+  .account-bar .iban { font-weight: bold; letter-spacing: 0.5px; }
+  .account-bar .meta { color: #444; }
+
+  /* ---------- Transactions table ---------- */
+  table.tx {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  table.tx th {
+    background: #d3d3d3;
+    border: 0.5px solid #a9a9a9;
+    padding: 3pt 4pt;
+    text-align: left;
+    font-size: 7pt;
+    vertical-align: top;
+  }
+  table.tx td {
+    border: 0.5px solid #d0d0d0;
+    padding: 3pt 4pt;
+    vertical-align: top;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+  }
+  table.tx tbody tr:nth-child(even) td { background: #f7f7f7; }
+
+  .col-no      { width: 5%;  text-align: right; }
+  .col-dates   { width: 10%; }
+  .col-ref     { width: 17%; }
+  .col-party   { width: 20%; }
+  .col-poziv   { width: 16%; }
+  .col-desc    { width: 12%; }
+  .col-amount  { width: 10%; text-align: right; }
+
+  table.tx th.col-no { text-align: right; }
+
+  td.num { text-align: right; white-space: nowrap; }
+  .muted { color: #555; }
+  .sub { display: block; color: #555; font-size: 7pt; }
+  .strong { font-weight: bold; }
+
+  tr.balance td {
+    background: #eef2f7 !important;
+    font-weight: bold;
+  }
+  tr.totals td {
+    border-top: 1.5px solid #808080;
+    font-weight: bold;
+    background: #fff;
+  }
+  tr.totals.closing td { background: #eef2f7; }
+
+  /* ---------- Footer ---------- */
+  .foot {
+    margin-top: 10pt;
+    padding-top: 4pt;
+    border-top: 1px solid #ccc;
+    font-size: 6.5pt;
+    color: #555;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<div class="head">
+  <div class="bank">
+    {{#if bankName}}<div class="name">{{bankName}}</div>{{/if}}
+    {{#if bankAddress}}<div>{{bankAddress}}</div>{{/if}}
+    {{#if bankOib}}<div>OIB: {{bankOib}}</div>{{/if}}
+    {{#if bankBic}}<div>SWIFT/BIC: {{bankBic}}</div>{{/if}}
+  </div>
+  <div class="doc">
+    <div class="title">IZVADAK br. {{statementNumber}}</div>
+    {{#if ownerOib}}<div>OIB: {{ownerOib}}</div>{{/if}}
+    {{#if statementDate}}<div class="muted">Datum izvatka: {{statementDate}}</div>{{/if}}
+    {{#if ownerName}}<div class="owner-name">{{ownerName}}</div>{{/if}}
+    {{#if ownerAddress}}<div>{{ownerAddress}}</div>{{/if}}
+  </div>
+</div>
+
+<div class="account-bar">
+  <span class="iban">IBAN {{accountIban}}</span>
+  <span class="meta">
+    {{#if accountName}}&nbsp;&middot;&nbsp;{{accountName}}{{/if}}
+    {{#if currency}}&nbsp;&middot;&nbsp;Valuta plaćanja: {{currency}}{{/if}}
+    {{#if periodFrom}}&nbsp;&middot;&nbsp;Razdoblje: {{periodFrom}}{{#if periodTo}} - {{periodTo}}{{/if}}{{/if}}
+  </span>
+</div>
+
+<table class="tx">
+  <thead>
+    <tr>
+      <th class="col-no">Red. broj</th>
+      <th class="col-dates">Datum knjiženja<span class="sub">Datum izvršenja</span></th>
+      <th class="col-ref">Referenca</th>
+      <th class="col-party">Račun i naziv platitelja / primatelja</th>
+      <th class="col-poziv">Poziv na broj platitelja<span class="sub">Poziv na broj primatelja</span></th>
+      <th class="col-desc">Opis plaćanja</th>
+      <th class="col-amount">Duguje</th>
+      <th class="col-amount">Potražuje</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="balance">
+      <td colspan="6">PRETHODNO STANJE</td>
+      <td class="num" colspan="2">{{#if openingBalance}}{{openingBalance}}{{/if}}</td>
+    </tr>
+
+    {{#each transactions}}
+    <tr>
+      <td class="col-no num">{{rowNumber}}</td>
+      <td>
+        {{bookingDate}}
+        {{#if valueDate}}<span class="sub">{{valueDate}}</span>{{/if}}
+      </td>
+      <td>
+        {{#if entryReference}}{{entryReference}}{{/if}}
+        {{#if transactionReference}}<span class="sub">{{transactionReference}}</span>{{/if}}
+      </td>
+      <td>
+        {{#if counterpartyIban}}<span class="strong">{{counterpartyIban}}</span>{{/if}}
+        {{#if counterpartyName}}<span class="sub">{{counterpartyName}}</span>{{/if}}
+        {{#if counterpartyAddress}}<span class="sub">{{counterpartyAddress}}</span>{{/if}}
+      </td>
+      <td>
+        {{#if payerReference}}{{payerReference}}{{/if}}
+        {{#if payeeReference}}<span class="sub">{{payeeReference}}</span>{{/if}}
+      </td>
+      <td>{{#if description}}{{description}}{{/if}}</td>
+      <td class="num">{{#if debitAmount}}{{debitAmount}}{{/if}}</td>
+      <td class="num">{{#if creditAmount}}{{creditAmount}}{{/if}}</td>
+    </tr>
+    {{/each}}
+
+    <tr class="totals">
+      <td colspan="6">Ukupan broj plaćanja</td>
+      <td class="num">{{#if debitCount}}{{debitCount}}{{/if}}</td>
+      <td class="num">{{#if creditCount}}{{creditCount}}{{/if}}</td>
+    </tr>
+    <tr class="totals">
+      <td colspan="6">Ukupan iznos plaćanja</td>
+      <td class="num">{{#if debitSum}}{{debitSum}}{{/if}}</td>
+      <td class="num">{{#if creditSum}}{{creditSum}}{{/if}}</td>
+    </tr>
+    <tr class="totals closing">
+      <td colspan="6">NOVO STANJE</td>
+      <td class="num" colspan="2">{{#if closingBalance}}{{closingBalance}}{{/if}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="foot">
+  <span>Ovaj dokument sačinjen je elektroničkim putem.</span>
+  <span>IZVADAK br. {{statementNumber}}{{#if accountIban}} &middot; {{accountIban}}{{/if}}</span>
+</div>
+
+</body>
+</html>

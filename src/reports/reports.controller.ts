@@ -7,6 +7,7 @@ import { IncomingInvoiceReportDto } from './dto/incoming-invoice-report.dto';
 import { PosTransactionReportDto } from './dto/pos-transaction-report.dto';
 import { DisbursementReportDto } from './dto/disbursement-report.dto';
 import { DepositReportDto } from './dto/deposit-report.dto';
+import { BankStatementReportDto } from './dto/bank-statement-report.dto';
 
 @Controller('reports')
 export class ReportsController {
@@ -70,6 +71,19 @@ export class ReportsController {
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="disbursement.pdf"',
+    });
+    res.send(pdf);
+  }
+
+  @Post('bank-statement')
+  async generateBankStatement(
+    @Body() dto: BankStatementReportDto,
+    @Res() res: express.Response,
+  ) {
+    const pdf = await this.reportsService.createBankStatement(dto);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'inline; filename="bank-statement.pdf"',
     });
     res.send(pdf);
   }

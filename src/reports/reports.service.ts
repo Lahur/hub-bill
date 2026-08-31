@@ -18,6 +18,7 @@ import { IncomingInvoiceReportDto } from './dto/incoming-invoice-report.dto';
 import { PosTransactionReportDto } from './dto/pos-transaction-report.dto';
 import { DisbursementReportDto } from './dto/disbursement-report.dto';
 import { DepositReportDto } from './dto/deposit-report.dto';
+import { BankStatementReportDto } from './dto/bank-statement-report.dto';
 
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
 
@@ -189,6 +190,14 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
           ),
         ]).then(() => undefined),
     );
+  }
+
+  async createBankStatement(dto: BankStatementReportDto): Promise<Buffer> {
+    this.logger.log(`Creating bank statement report ${dto.statementNumber}`);
+    return this.renderTemplate('template_bank_statement.html', {
+      ...dto,
+      transactions: dto.transactions ?? [],
+    });
   }
 
   async createDeposit(dto: DepositReportDto): Promise<Buffer> {
