@@ -34,3 +34,15 @@ database:
   existingSecret: hub-bill-db
   secretUsernameKey: username
   secretPasswordKey: password
+
+adminIngress:
+  # Publicly exposes ONLY /admin/* (the new-tenant form) behind Basic Auth - /reports/* stays
+  # internal-only via the ClusterIP service. Shares the cluster's existing ingress-nginx
+  # controller and letsencrypt-prod ClusterIssuer (see k8s_pulumi/pulumi_hetzner).
+  enabled: true
+  host: bill.tehnomodus.com
+  ingressClassName: nginx
+  clusterIssuer: letsencrypt-prod
+  # Secret must contain an "auth" key with htpasswd content, e.g.:
+  #   kubectl create secret generic hub-bill-admin-auth -n bill --from-literal=auth="user:$apr1$..."
+  authSecret: hub-bill-admin-auth
