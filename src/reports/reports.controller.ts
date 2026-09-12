@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Headers, Res } from '@nestjs/common';
 import express from 'express';
 import { ReportsService } from './reports.service';
 import { BillReportDto } from './dto/bill-report.dto';
@@ -14,8 +14,12 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Post('bill')
-  async generateBill(@Body() dto: BillReportDto, @Res() res: express.Response) {
-    const pdf = await this.reportsService.createBill(dto);
+  async generateBill(
+    @Body() dto: BillReportDto,
+    @Headers('x-tenant-id') tenantId: string | undefined,
+    @Res() res: express.Response,
+  ) {
+    const pdf = await this.reportsService.createBill(dto, tenantId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="bill.pdf"',
@@ -26,9 +30,10 @@ export class ReportsController {
   @Post('bill-with-details')
   async generateBillWithDetails(
     @Body() dto: BillWithDetailsReportDto,
+    @Headers('x-tenant-id') tenantId: string | undefined,
     @Res() res: express.Response,
   ) {
-    const pdf = await this.reportsService.createDetailedBill(dto);
+    const pdf = await this.reportsService.createDetailedBill(dto, tenantId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="bill-with-details.pdf"',
@@ -39,9 +44,10 @@ export class ReportsController {
   @Post('incoming-invoice')
   async generateIncomingInvoice(
     @Body() dto: IncomingInvoiceReportDto,
+    @Headers('x-tenant-id') tenantId: string | undefined,
     @Res() res: express.Response,
   ) {
-    const pdf = await this.reportsService.createIngoingBill(dto);
+    const pdf = await this.reportsService.createIngoingBill(dto, tenantId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="incoming-invoice.pdf"',
@@ -52,9 +58,10 @@ export class ReportsController {
   @Post('pos-transaction')
   async generatePosTransaction(
     @Body() dto: PosTransactionReportDto,
+    @Headers('x-tenant-id') tenantId: string | undefined,
     @Res() res: express.Response,
   ) {
-    const pdf = await this.reportsService.createPosTransaction(dto);
+    const pdf = await this.reportsService.createPosTransaction(dto, tenantId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="pos-transaction.pdf"',
@@ -65,9 +72,10 @@ export class ReportsController {
   @Post('disbursement')
   async generateDisbursement(
     @Body() dto: DisbursementReportDto,
+    @Headers('x-tenant-id') tenantId: string | undefined,
     @Res() res: express.Response,
   ) {
-    const pdf = await this.reportsService.createDisbursement(dto);
+    const pdf = await this.reportsService.createDisbursement(dto, tenantId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="disbursement.pdf"',
@@ -78,9 +86,10 @@ export class ReportsController {
   @Post('bank-statement')
   async generateBankStatement(
     @Body() dto: BankStatementReportDto,
+    @Headers('x-tenant-id') tenantId: string | undefined,
     @Res() res: express.Response,
   ) {
-    const pdf = await this.reportsService.createBankStatement(dto);
+    const pdf = await this.reportsService.createBankStatement(dto, tenantId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="bank-statement.pdf"',
@@ -91,9 +100,10 @@ export class ReportsController {
   @Post('deposit')
   async generateDeposit(
     @Body() dto: DepositReportDto,
+    @Headers('x-tenant-id') tenantId: string | undefined,
     @Res() res: express.Response,
   ) {
-    const pdf = await this.reportsService.createDeposit(dto);
+    const pdf = await this.reportsService.createDeposit(dto, tenantId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': 'inline; filename="deposit.pdf"',

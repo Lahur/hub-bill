@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:18.4
+    container_name: hub-bill-postgres
+    restart: unless-stopped
+    environment:
+      # Matches the role/database name Pulumi provisions in production
+      # (k8s_pulumi/pulumi_hetzner deployHubBillDb) and .env below.
+      POSTGRES_DB: hub_bill
+      POSTGRES_USER: hub_bill
+      POSTGRES_PASSWORD: hub_bill_dev
+    ports:
+      # Non-default host port so this doesn't clash with other local Postgres instances.
+      - "5434:5432"
+    volumes:
+      # Postgres 18's image expects a single mount at /var/lib/postgresql (it places
+      # versioned data below that itself) - see https://github.com/docker-library/postgres/pull/1259.
+      - hub-bill-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hub_bill -d hub_bill"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  hub-bill-postgres-data:

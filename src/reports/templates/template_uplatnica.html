@@ -123,15 +123,15 @@
   <div class="grid grid-cols-3 text-center mt-[0.35cm]">
     <div>
       <p class="red text-[7px] tracking-wide">Likvidator</p>
-      <div class="mono text-stone-800 flex items-start justify-center mt-1" style="font-size:30px; height:48px;">{{#if liquidator}}{{#if (isImageSrc liquidator)}}<img src="{{liquidator}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{else}}{{liquidator}}{{/if}}{{else}}<img src="{{templateDir}}/assets/default-signature.png" style="max-height:100%; max-width:100%; object-fit:contain;">{{/if}}</div>
+      <div class="mono text-stone-800 flex items-start justify-center mt-1" style="font-size:30px; height:48px;">{{#if liquidator}}{{#if (isImageSrc liquidator)}}<img src="{{liquidator}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{else}}{{liquidator}}{{/if}}{{else}}<img src="{{{defaultSignatureSrc}}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{/if}}</div>
     </div>
     <div>
       <p class="red text-[7px] tracking-wide">Blagajnik</p>
-      <div class="mono text-stone-800 flex items-start justify-center mt-1" style="font-size:30px; height:48px;">{{#if cashier}}{{#if (isImageSrc cashier)}}<img src="{{cashier}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{else}}{{cashier}}{{/if}}{{else}}<img src="{{templateDir}}/assets/default-signature.png" style="max-height:100%; max-width:100%; object-fit:contain;">{{/if}}</div>
+      <div class="mono text-stone-800 flex items-start justify-center mt-1" style="font-size:30px; height:48px;">{{#if cashier}}{{#if (isImageSrc cashier)}}<img src="{{cashier}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{else}}{{cashier}}{{/if}}{{else}}<img src="{{{defaultSignatureSrc}}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{/if}}</div>
     </div>
     <div>
       <p class="red text-[7px] tracking-wide">Uplatitelj</p>
-      <div class="mono text-stone-800 flex items-start justify-center mt-1" style="font-size:30px; height:48px;">{{#if payerSignature}}{{#if (isImageSrc payerSignature)}}<img src="{{payerSignature}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{else}}{{payerSignature}}{{/if}}{{else}}<img src="{{templateDir}}/assets/default-signature.png" style="max-height:100%; max-width:100%; object-fit:contain;">{{/if}}</div>
+      <div class="mono text-stone-800 flex items-start justify-center mt-1" style="font-size:30px; height:48px;">{{#if payerSignature}}{{#if (isImageSrc payerSignature)}}<img src="{{payerSignature}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{else}}{{payerSignature}}{{/if}}{{else}}<img src="{{{defaultSignatureSrc}}}" style="max-height:100%; max-width:100%; object-fit:contain;">{{/if}}</div>
     </div>
   </div>
 

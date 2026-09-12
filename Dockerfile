@@ -33,6 +33,7 @@ ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 RUN npm ci --omit=dev
 
 COPY --from=build /app/dist ./dist
+COPY db/migrations ./db/migrations
 
 RUN chown -R hub-bill:hub-bill /app
 USER hub-bill

@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Injectable,
   Logger,
+  Optional,
   OnModuleInit,
   OnModuleDestroy,
 } from '@nestjs/common';
@@ -11,6 +13,8 @@ import { randomUUID } from 'crypto';
 import * as Handlebars from 'handlebars';
 import puppeteer, { Browser, Page, PDFOptions } from 'puppeteer';
 import { PDFDocument } from 'pdf-lib';
+import { TenantTemplatesService } from '../tenants/tenant-templates.service';
+import { TENANT_TEMPLATE_CODES } from '../tenants/template-code';
 import { BillReportDto } from './dto/bill-report.dto';
 import { BillWithDetailsReportDto } from './dto/bill-with-details-report.dto';
 import { InvoiceDetailsReportDto } from './dto/invoice-details-report.dto';
@@ -21,6 +25,12 @@ import { DepositReportDto } from './dto/deposit-report.dto';
 import { BankStatementReportDto } from './dto/bank-statement-report.dto';
 
 const TEMPLATES_DIR = path.join(__dirname, 'templates');
+
+// Templates that fall back to a default signature image when none is supplied per-transaction.
+const NEEDS_DEFAULT_SIGNATURE = new Set([
+  'template_isplatnica.html',
+  'template_uplatnica.html',
+]);
 
 Handlebars.registerHelper('isImageSrc', (value: unknown) => {
   if (typeof value !== 'string') return false;
@@ -36,6 +46,10 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ReportsService.name);
   private browser: Browser;
 
+  constructor(
+    @Optional() private readonly templatesService?: TenantTemplatesService,
+  ) {}
+
   async onModuleInit() {
     this.browser = await puppeteer.launch({
       args: ['--no-sandbox', '--disable-crash-reporter'],
@@ -46,19 +60,64 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
     await this.browser.close();
   }
 
+  private async resolveAssetSrc(
+    assetKey: 'logo' | 'default-signature',
+    fallbackRelativePath: string,
+    tenantCode: string | undefined,
+  ): Promise<string> {
+    if (!tenantCode) {
+      return `file://${path.join(TEMPLATES_DIR, fallbackRelativePath)}`;
+    }
+    if (!this.templatesService) {
+      throw new BadRequestException(
+        'Tenant support is not configured on this instance',
+      );
+    }
+    return this.templatesService.getAssetDataUri(tenantCode, assetKey);
+  }
+
   private async renderTemplate(
     templateFile: string,
     data: object,
     pdfOptions: PDFOptions = { format: 'A4' },
     postProcess?: (page: Page) => Promise<void>,
+    tenantCode?: string,
   ): Promise<Buffer> {
-    const source = fs.readFileSync(
-      path.join(TEMPLATES_DIR, templateFile),
-      'utf-8',
-    );
+    let source: string;
+    const extra: Record<string, string> = {};
+    const templateCode = TENANT_TEMPLATE_CODES[templateFile];
+
+    if (tenantCode && templateCode) {
+      if (!this.templatesService) {
+        throw new BadRequestException(
+          'Tenant support is not configured on this instance',
+        );
+      }
+      // The tenant's stored copy has {{{logoSrc}}} in place of the hardcoded logo.jpeg path.
+      source = await this.templatesService.getTemplateHtml(
+        tenantCode,
+        templateCode,
+      );
+      extra.logoSrc = await this.templatesService.getAssetDataUri(
+        tenantCode,
+        'logo',
+      );
+    } else {
+      source = fs.readFileSync(path.join(TEMPLATES_DIR, templateFile), 'utf-8');
+    }
+
+    if (NEEDS_DEFAULT_SIGNATURE.has(templateFile)) {
+      extra.defaultSignatureSrc = await this.resolveAssetSrc(
+        'default-signature',
+        'assets/default-signature.png',
+        tenantCode,
+      );
+    }
+
     const html = Handlebars.compile(source)({
       ...data,
       templateDir: `file://${TEMPLATES_DIR}`,
+      ...extra,
     });
 
     const tmpFile = path.join(os.tmpdir(), `report-${randomUUID()}.html`);
@@ -132,16 +191,37 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  async createBill(dto: BillReportDto): Promise<Buffer> {
+  async createBill(dto: BillReportDto, tenantCode?: string): Promise<Buffer> {
     this.logger.log(`Creating bill ${dto.billNumber}`);
-    return this.renderTemplate('template.html', dto);
+    return this.renderTemplate(
+      'template_outgoing_bill.html',
+      dto,
+      undefined,
+      undefined,
+      tenantCode,
+    );
   }
 
-  async createDetailedBill(dto: BillWithDetailsReportDto): Promise<Buffer> {
+  async createDetailedBill(
+    dto: BillWithDetailsReportDto,
+    tenantCode?: string,
+  ): Promise<Buffer> {
     this.logger.log(`Creating detailed bill ${dto.billNumber}`);
     const [billBuffer, detailsBuffer] = await Promise.all([
-      this.renderTemplate('template.html', dto),
-      this.renderTemplate('template_details.html', dto.details),
+      this.renderTemplate(
+        'template_outgoing_bill.html',
+        dto,
+        undefined,
+        undefined,
+        tenantCode,
+      ),
+      this.renderTemplate(
+        'template_outgoing_bill_info.html',
+        dto.details,
+        undefined,
+        undefined,
+        tenantCode,
+      ),
     ]);
 
     const merged = await PDFDocument.create();
@@ -155,17 +235,38 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
     return Buffer.from(await merged.save());
   }
 
-  async createIngoingBill(dto: IncomingInvoiceReportDto): Promise<Buffer> {
+  async createIngoingBill(
+    dto: IncomingInvoiceReportDto,
+    tenantCode?: string,
+  ): Promise<Buffer> {
     this.logger.log(`Creating incoming invoice ${dto.invoiceId}`);
-    return this.renderTemplate('template_outgoing.html', dto);
+    return this.renderTemplate(
+      'template_ingoing_bill.html',
+      dto,
+      undefined,
+      undefined,
+      tenantCode,
+    );
   }
 
-  async createPosTransaction(dto: PosTransactionReportDto): Promise<Buffer> {
+  async createPosTransaction(
+    dto: PosTransactionReportDto,
+    tenantCode?: string,
+  ): Promise<Buffer> {
     this.logger.log(`Creating POS transaction report ${dto.transactionId}`);
-    return this.renderTemplate('template_pos_transaction.html', dto);
+    return this.renderTemplate(
+      'template_pos_transaction.html',
+      dto,
+      undefined,
+      undefined,
+      tenantCode,
+    );
   }
 
-  async createDisbursement(dto: DisbursementReportDto): Promise<Buffer> {
+  async createDisbursement(
+    dto: DisbursementReportDto,
+    tenantCode?: string,
+  ): Promise<Buffer> {
     this.logger.log(`Creating disbursement ${dto.disbursementNumber}`);
     return this.renderTemplate(
       'template_isplatnica.html',
@@ -189,18 +290,31 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
             dto.purpose,
           ),
         ]).then(() => undefined),
+      tenantCode,
     );
   }
 
-  async createBankStatement(dto: BankStatementReportDto): Promise<Buffer> {
+  async createBankStatement(
+    dto: BankStatementReportDto,
+    tenantCode?: string,
+  ): Promise<Buffer> {
     this.logger.log(`Creating bank statement report ${dto.statementNumber}`);
-    return this.renderTemplate('template_bank_statement.html', {
-      ...dto,
-      transactions: dto.transactions ?? [],
-    });
+    return this.renderTemplate(
+      'template_bank_statement.html',
+      {
+        ...dto,
+        transactions: dto.transactions ?? [],
+      },
+      undefined,
+      undefined,
+      tenantCode,
+    );
   }
 
-  async createDeposit(dto: DepositReportDto): Promise<Buffer> {
+  async createDeposit(
+    dto: DepositReportDto,
+    tenantCode?: string,
+  ): Promise<Buffer> {
     this.logger.log(`Creating deposit ${dto.depositNumber}`);
     return this.renderTemplate(
       'template_uplatnica.html',
@@ -224,6 +338,7 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
             dto.purpose,
           ),
         ]).then(() => undefined),
+      tenantCode,
     );
   }
 }

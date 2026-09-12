@@ -21,3 +21,16 @@ service:
 
 metrics:
   portName: http
+
+database:
+  # Enables tenant-aware report rendering (templates/logo/signature stored per tenant).
+  # When false, the app runs exactly as without a database - filesystem templates only.
+  # host/name/existingSecret match the shared "postgres" instance and "hub-bill-db" Secret
+  # provisioned by k8s_pulumi/pulumi_hetzner (deployHubBillDb).
+  enabled: true
+  host: postgres
+  port: 5432
+  name: hub_bill
+  existingSecret: hub-bill-db
+  secretUsernameKey: username
+  secretPasswordKey: password

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New tenant</title>
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; color: #222; }
+  h1 { font-size: 20px; }
+  label { display: block; font-weight: bold; margin-top: 16px; margin-bottom: 4px; }
+  input[type="text"], input[type="file"] { width: 100%; padding: 6px; box-sizing: border-box; }
+  .hint { color: #666; font-size: 12px; margin-top: 2px; }
+  button { margin-top: 20px; padding: 8px 20px; font-size: 14px; cursor: pointer; }
+  .result { margin-top: 16px; padding: 10px; border-radius: 4px; }
+  .result.success { background: #e6f4ea; color: #1e7e34; }
+  .result.error { background: #fdecea; color: #b3261e; }
+</style>
+</head>
+<body>
+
+<h1>Create tenant</h1>
+
+<form hx-post="/admin/tenants" hx-encoding="multipart/form-data" hx-target="#result" hx-swap="innerHTML">
+  <label for="code">Tenant code</label>
+  <input type="text" id="code" name="code" required>
+  <div class="hint">Short unique identifier, e.g. "acme". Sent as the X-Tenant-Id header value.</div>
+
+  <label for="name">Tenant name</label>
+  <input type="text" id="name" name="name" required>
+
+  <label for="outgoingBillHtml">OUTGOING_BILL template (.html)</label>
+  <input type="file" id="outgoingBillHtml" name="outgoingBillHtml" accept=".html,text/html" required>
+
+  <label for="outgoingBillInfoHtml">OUTGOING_BILL_INFO template (.html)</label>
+  <input type="file" id="outgoingBillInfoHtml" name="outgoingBillInfoHtml" accept=".html,text/html" required>
+
+  <label for="ingoingBillHtml">INGOING_BILL template (.html)</label>
+  <input type="file" id="ingoingBillHtml" name="ingoingBillHtml" accept=".html,text/html" required>
+
+  <label for="logo">Logo</label>
+  <input type="file" id="logo" name="logo" accept="image/*" required>
+
+  <label for="signature">Default signature</label>
+  <input type="file" id="signature" name="signature" accept="image/*" required>
+
+  <button type="submit">Create tenant</button>
+</form>
+
+<div id="result"></div>
+
+</body>
+</html>
