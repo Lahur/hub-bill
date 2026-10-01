@@ -2,11 +2,9 @@ export class BankStatementTransactionDto {
   rowNumber: number;
   bookingDate: string;
   valueDate?: string;
-  entryReference?: string;
   transactionReference?: string;
   counterpartyIban?: string;
   counterpartyName?: string;
-  counterpartyAddress?: string;
   payerReference?: string;
   payeeReference?: string;
   description?: string;
@@ -17,7 +15,6 @@ export class BankStatementTransactionDto {
 export class BankStatementReportDto {
   bankName?: string;
   bankAddress?: string;
-  bankOib?: string;
   bankBic?: string;
   statementNumber: string;
   statementDate?: string;

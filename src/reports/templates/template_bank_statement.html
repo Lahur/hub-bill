@@ -113,7 +113,6 @@
   <div class="bank">
     {{#if bankName}}<div class="name">{{bankName}}</div>{{/if}}
     {{#if bankAddress}}<div>{{bankAddress}}</div>{{/if}}
-    {{#if bankOib}}<div>OIB: {{bankOib}}</div>{{/if}}
     {{#if bankBic}}<div>SWIFT/BIC: {{bankBic}}</div>{{/if}}
   </div>
   <div class="doc">
@@ -161,13 +160,11 @@
         {{#if valueDate}}<span class="sub">{{valueDate}}</span>{{/if}}
       </td>
       <td>
-        {{#if entryReference}}{{entryReference}}{{/if}}
-        {{#if transactionReference}}<span class="sub">{{transactionReference}}</span>{{/if}}
+        {{#if transactionReference}}{{transactionReference}}{{/if}}
       </td>
       <td>
         {{#if counterpartyIban}}<span class="strong">{{counterpartyIban}}</span>{{/if}}
         {{#if counterpartyName}}<span class="sub">{{counterpartyName}}</span>{{/if}}
-        {{#if counterpartyAddress}}<span class="sub">{{counterpartyAddress}}</span>{{/if}}
       </td>
       <td>
         {{#if payerReference}}{{payerReference}}{{/if}}
