@@ -19,6 +19,7 @@ export interface CreateTenantInput {
   ingoingBillHtml: string;
   logo: UploadedAsset;
   signature: UploadedAsset;
+  signatureWithStamp: UploadedAsset;
 }
 
 // Postgres unique_violation - see https://www.postgresql.org/docs/current/errcodes-appendix.html
@@ -56,6 +57,12 @@ export class TenantAdminService {
           assetKey: 'default-signature',
           content: input.signature.buffer,
           contentType: input.signature.mimetype,
+        });
+        await manager.save(TenantAsset, {
+          tenant,
+          assetKey: 'default-signature-with-stamp',
+          content: input.signatureWithStamp.buffer,
+          contentType: input.signatureWithStamp.mimetype,
         });
       });
     } catch (err) {

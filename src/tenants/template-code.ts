@@ -11,7 +11,7 @@ export enum TemplateCode {
 // Maps each tenant-customizable template file to its TemplateCode.
 // template_pos_transaction.html/template_bank_statement.html have no tenant-specific content
 // at all (shared filesystem markup, no logo). template_isplatnica.html/template_uplatnica.html
-// are similarly absent, but do pull a tenant-specific default-signature asset at render time
+// are similarly absent, but do pull the tenant-specific default-signature(-with-stamp) assets at render time
 // (see NEEDS_DEFAULT_SIGNATURE in reports.service.ts).
 export const TENANT_TEMPLATE_CODES: Record<string, TemplateCode> = {
   'template_outgoing_bill.html': TemplateCode.OUTGOING_BILL,

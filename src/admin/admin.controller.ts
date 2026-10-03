@@ -23,6 +23,7 @@ type UploadedFileMap = {
   ingoingBillHtml?: Express.Multer.File[];
   logo?: Express.Multer.File[];
   signature?: Express.Multer.File[];
+  signatureWithStamp?: Express.Multer.File[];
 };
 
 function escapeHtml(value: string): string {
@@ -52,6 +53,7 @@ export class AdminController {
         { name: 'ingoingBillHtml', maxCount: 1 },
         { name: 'logo', maxCount: 1 },
         { name: 'signature', maxCount: 1 },
+        { name: 'signatureWithStamp', maxCount: 1 },
       ],
       { limits: { fileSize: MAX_UPLOAD_SIZE } },
     ),
@@ -66,6 +68,7 @@ export class AdminController {
     const ingoingBillHtml = files.ingoingBillHtml?.[0];
     const logo = files.logo?.[0];
     const signature = files.signature?.[0];
+    const signatureWithStamp = files.signatureWithStamp?.[0];
 
     const missing = [
       !body.code && 'code',
@@ -75,6 +78,7 @@ export class AdminController {
       !ingoingBillHtml && 'INGOING_BILL html file',
       !logo && 'logo',
       !signature && 'signature',
+      !signatureWithStamp && 'signature with stamp',
     ].filter(Boolean);
 
     if (missing.length > 0) {
@@ -95,6 +99,10 @@ export class AdminController {
         signature: {
           buffer: signature!.buffer,
           mimetype: signature!.mimetype,
+        },
+        signatureWithStamp: {
+          buffer: signatureWithStamp!.buffer,
+          mimetype: signatureWithStamp!.mimetype,
         },
       });
     } catch (err) {

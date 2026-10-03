@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   Logger,
+  NotFoundException,
   Optional,
   OnModuleInit,
   OnModuleDestroy,
@@ -61,7 +62,7 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async resolveAssetSrc(
-    assetKey: 'logo' | 'default-signature',
+    assetKey: 'logo' | 'default-signature' | 'default-signature-with-stamp',
     fallbackRelativePath: string,
     tenantCode: string | undefined,
   ): Promise<string> {
@@ -112,6 +113,19 @@ export class ReportsService implements OnModuleInit, OnModuleDestroy {
         'assets/default-signature.png',
         tenantCode,
       );
+      // Stamped variant (isplatnica: second signature, uplatnica: third signature). Tenants
+      // created before this asset existed don't have one - they fall back to their plain
+      // default signature.
+      try {
+        extra.defaultSignatureWithStampSrc = await this.resolveAssetSrc(
+          'default-signature-with-stamp',
+          'assets/default-signature-with-stamp.png',
+          tenantCode,
+        );
+      } catch (err) {
+        if (!(err instanceof NotFoundException)) throw err;
+        extra.defaultSignatureWithStampSrc = extra.defaultSignatureSrc;
+      }
     }
 
     const html = Handlebars.compile(source)({
