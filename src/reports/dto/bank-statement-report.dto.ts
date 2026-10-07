@@ -17,6 +17,7 @@ export class BankStatementReportDto {
   bankAddress?: string;
   bankBic?: string;
   statementNumber: string;
+  sequenceNumber?: string;
   statementDate?: string;
   accountIban: string;
   accountName?: string;

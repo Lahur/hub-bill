@@ -116,7 +116,7 @@
     {{#if bankBic}}<div>SWIFT/BIC: {{bankBic}}</div>{{/if}}
   </div>
   <div class="doc">
-    <div class="title">IZVADAK br. {{statementNumber}}</div>
+    <div class="title">IZVADAK br. {{#if sequenceNumber}}{{sequenceNumber}}{{else}}{{statementNumber}}{{/if}}</div>
     {{#if ownerOib}}<div>OIB: {{ownerOib}}</div>{{/if}}
     {{#if statementDate}}<div class="muted">Datum izvatka: {{statementDate}}</div>{{/if}}
     {{#if ownerName}}<div class="owner-name">{{ownerName}}</div>{{/if}}
@@ -195,7 +195,7 @@
 
 <div class="foot">
   <span>Ovaj dokument sačinjen je elektroničkim putem.</span>
-  <span>IZVADAK br. {{statementNumber}}{{#if accountIban}} &middot; {{accountIban}}{{/if}}</span>
+  <span>IZVADAK br. {{#if sequenceNumber}}{{sequenceNumber}}{{else}}{{statementNumber}}{{/if}}{{#if accountIban}} &middot; {{accountIban}}{{/if}}</span>
 </div>
 
 </body>
